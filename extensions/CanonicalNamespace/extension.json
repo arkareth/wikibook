@@ -5,6 +5,7 @@
 		"Sergey Menshikov"
 	],
 	"url": "https://www.mediawiki.org/wiki/Extension:CanonicalNamespace",
+	"description": "Sets canonical URLs and redirects based on canonical and latest namespace names.",
 	"license-name": "MIT",
 	"type": "other",
 	"AutoloadClasses": {

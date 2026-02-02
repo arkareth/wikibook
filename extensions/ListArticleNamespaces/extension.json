@@ -4,7 +4,8 @@
 	"author": [
 		"Sergey Menshikov"
 	],
-	"url": "https://www.mediawiki.org/wiki/Extension:BoilerPlate",
+	"url": "https://www.mediawiki.org/wiki/Extension:ListArticleNamespaces",
+	"description": "Parser tag to list namespaces that contain a page with the same base title as the current page.",
 	"license-name": "MIT",
 	"type": "other",
 	"AutoloadClasses": {

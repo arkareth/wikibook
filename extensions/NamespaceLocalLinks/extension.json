@@ -4,14 +4,15 @@
 	"author": [
 		"Sergey Menshikov"
 	],
-	"url": "https://www.mediawiki.org/wiki/Extension:BoilerPlate",
+	"url": "https://www.mediawiki.org/wiki/Extension:NamespaceLocalLinks",
+	"description": "Makes links in custom namespaces resolve relative to the current namespace (namespace-local links).",
 	"license-name": "MIT",
 	"type": "other",
 	"AutoloadClasses": {
 		"NamespaceLocalLinks": "NamespaceLocalLinks.class.php"
 	},
 	"Hooks": {
-		"ParserBeforeStrip": "NamespaceLocalLinks::onParserBeforeStrip",
+		"ParserBeforeInternalParse": "NamespaceLocalLinks::onParserBeforeStrip",
 		"InitializeArticleMaybeRedirect": "NamespaceLocalLinks::onInitializeArticleMaybeRedirect",
 		"HtmlPageLinkRendererBegin": "NamespaceLocalLinks::onHtmlPageLinkRendererBegin"
 	},
