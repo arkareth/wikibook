@@ -8,8 +8,8 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 
-use MediaWiki\Context\RequestContext;
 use MediaWiki\Content\ContentHandler;
+use MediaWiki\Context\RequestContext;
 use MediaWiki\Html\Html;
 use MediaWiki\Language\Language;
 use MediaWiki\MainConfigNames;
@@ -24,8 +24,7 @@ use Wikimedia\Parsoid\Core\TOCData;
  * @copyright 2018 Sergey Menshikov
  * @license MIT
  */
-class SuperPageTOC
-{
+class SuperPageTOC {
 	/** @var int|null */
 	private static $mLevel;
 
@@ -51,6 +50,22 @@ class SuperPageTOC
 	private static $mPageLangCode;
 
 	/**
+	 * Hook handler for BeforePageDisplay
+	 * Ensure our TOC styles (sticky override, whitespace) load on every page for skins that
+	 * move the TOC to a sidebar, so they apply regardless of parser cache.
+	 *
+	 * @param \MediaWiki\Output\OutputPage $out
+	 * @param \MediaWiki\Skin\Skin $skin
+	 * @return void
+	 */
+	public static function onBeforePageDisplay( $out, $skin ): void {
+		$skinName = $skin->getSkinName();
+		if ( in_array( $skinName, [ 'tweeki' ], true ) ) {
+			$out->addModuleStyles( [ 'ext.superpagetoc.styles' ] );
+		}
+	}
+
+	/**
 	 * Hook handler for ParserBeforeStrip
 	 *
 	 * @param Parser $parser
@@ -67,7 +82,8 @@ class SuperPageTOC
 		}
 		$request = RequestContext::getMain()->getRequest();
 		$action = $request->getVal( 'action', 'view' );
-		if ( in_array( $action, [ 'view', 'print', 'purge' ], true ) || $action === null ) {
+		// Only inject version selector and TOC on view/print (not purge, history, etc.)
+		if ( in_array( $action, [ 'view', 'print' ], true ) || $action === null ) {
 			// Per parser instance so each parse (e.g. oldid view) gets the injection; static $hasRun
 			// once per request caused version controls/TOC to be skipped on ?oldid pages.
 			static $injectedParserIds = [];
@@ -79,7 +95,7 @@ class SuperPageTOC
 			// Ensure TOC is always shown
 			$text = "__FORCETOC__\r\n" . $text;
 			// Show language bar for pages subject to translation
-			$text = "<languages/><list-article-namespaces/>\n".$text;
+			$text = "<languages/><doc-version-selector/>\n" . $text;
 			// Add /prevnext/ ? only from subpages
 			$doc = $title->getFullText();
 			$separatorPos = strpos( $doc, '/' );
@@ -100,8 +116,7 @@ class SuperPageTOC
 	 * @param \MediaWiki\Parser\StripState &$stripState
 	 * @return bool
 	 */
-	public static function onParserAfterParse( Parser $parser, string &$text, &$stripState ): bool
-	{
+	public static function onParserAfterParse( Parser $parser, string &$text, &$stripState ): bool {
 		/** @var Title $title */
 		$title = $parser->getPage();
 		if ( !$title->exists() ) {
@@ -110,6 +125,8 @@ class SuperPageTOC
 		$tocText = self::generateTOC( $parser->getOutput()->getTOCData() );
 		// If there is a TOC and we are not printing - substitute with a new TOC
 		if ( strlen( $tocText ) > 0 && !$parser->getOptions()->getIsPrintable() ) {
+			// addModuleStyles() requires an array of module names (MW 1.40+)
+			$parser->getOutput()->addModuleStyles( [ 'ext.superpagetoc.styles' ] );
 			// Memorize lang codes
 			self::$mNamespace = $title->getSubjectNsText();
 			self::$mPageLangCode = $title->getPageLanguage()->getCode();
@@ -249,8 +266,7 @@ class SuperPageTOC
 	 * @param array $superTocArray
 	 * @return array
 	 */
-	private static function generateSuperPageTocList( Title $childTitle, ?string $heading, array $superTocArray ): array
-	{
+	private static function generateSuperPageTocList( Title $childTitle, ?string $heading, array $superTocArray ): array {
 		$topicFound = false;
 
 		// Find a superpage, if exists
@@ -377,53 +393,52 @@ class SuperPageTOC
 		return null;
 	}
 
-    /**
-     * Generate a table of contents from a section tree.
-     *
-     * @param ?TOCData $tocData Return value of ParserOutput::getSections()
-     * @param Language|null $lang Language for the toc title, defaults to user language
-     * @param array $options
-     *   - 'maxtoclevel' Max TOC level to generate
-     * @return string HTML fragment
-     */
-    public static function generateTOCHtml(?TOCData $tocData, ?Language $lang = null, array $options = []): string
-    {
-        $toc = '';
-        $lastLevel = 0;
-        $maxTocLevel = $options['maxtoclevel'] ?? null;
-        if ($maxTocLevel === null) {
-            // Use wiki-configured default
-            $services = MediaWikiServices::getInstance();
-            $config = $services->getMainConfig();
-            $maxTocLevel = $config->get(MainConfigNames::MaxTocLevel);
-        }
-        foreach (($tocData ? $tocData->getSections() : []) as $section) {
-            $tocLevel = $section->tocLevel;
-            if ($tocLevel < $maxTocLevel) {
-                if ($tocLevel > $lastLevel) {
-                    $toc .= "\n<ul>\n";
-                } elseif ($tocLevel < $lastLevel) {
-                    if ($lastLevel < $maxTocLevel) {
-                        $toc .= self::tocUnindent(
-                            $lastLevel - $tocLevel);
-                    } else {
-                        $toc .= self::tocLineEnd();
-                    }
-                } else {
-                    $toc .= self::tocLineEnd();
-                }
+	/**
+	 * Generate a table of contents from a section tree.
+	 *
+	 * @param ?TOCData $tocData Return value of ParserOutput::getSections()
+	 * @param Language|null $lang Language for the toc title, defaults to user language
+	 * @param array $options
+	 *   - 'maxtoclevel' Max TOC level to generate
+	 * @return string HTML fragment
+	 */
+	public static function generateTOCHtml( ?TOCData $tocData, ?Language $lang = null, array $options = [] ): string {
+		$toc = '';
+		$lastLevel = 0;
+		$maxTocLevel = $options['maxtoclevel'] ?? null;
+		if ( $maxTocLevel === null ) {
+			// Use wiki-configured default
+			$services = MediaWikiServices::getInstance();
+			$config = $services->getMainConfig();
+			$maxTocLevel = $config->get( MainConfigNames::MaxTocLevel );
+		}
+		foreach ( ( $tocData ? $tocData->getSections() : [] ) as $section ) {
+			$tocLevel = $section->tocLevel;
+			if ( $tocLevel < $maxTocLevel ) {
+				if ( $tocLevel > $lastLevel ) {
+					$toc .= "\n<ul>\n";
+				} elseif ( $tocLevel < $lastLevel ) {
+					if ( $lastLevel < $maxTocLevel ) {
+						$toc .= self::tocUnindent(
+							$lastLevel - $tocLevel );
+					} else {
+						$toc .= self::tocLineEnd();
+					}
+				} else {
+					$toc .= self::tocLineEnd();
+				}
 
-                $toc .= self::tocLine($section->linkAnchor,
-                    $section->line, $section->number,
-                    $tocLevel, $section->index);
-                $lastLevel = $tocLevel;
-            }
-        }
-        if ($lastLevel < $maxTocLevel && $lastLevel > 0) {
-            $toc .= self::tocUnindent($lastLevel - 1);
-        }
-        return self::tocList($toc, $lang);
-    }
+				$toc .= self::tocLine( $section->linkAnchor,
+					$section->line, $section->number,
+					$tocLevel, $section->index );
+				$lastLevel = $tocLevel;
+			}
+		}
+		if ( $lastLevel < $maxTocLevel && $lastLevel > 0 ) {
+			$toc .= self::tocUnindent( $lastLevel - 1 );
+		}
+		return self::tocList( $toc, $lang );
+	}
 
 	/**
 	 * Add another level to the Table of Contents
@@ -464,8 +479,7 @@ class SuperPageTOC
 	 * @param string|false $sectionIndex
 	 * @return string
 	 */
-	private static function tocLine( string $linkAnchor, string $tocline, string $tocnumber, int $level, $sectionIndex = false ): string
-	{
+	private static function tocLine( string $linkAnchor, string $tocline, string $tocnumber, int $level, $sectionIndex = false ): string {
 		$classes = "toclevel-$level";
 
 		// Parser.php used to suppress tocLine by setting $sectionIndex to false.
@@ -493,8 +507,7 @@ class SuperPageTOC
 	 * @param Language|null $lang Language for the toc title, defaults to user language
 	 * @return string Full html of the TOC
 	 */
-	private static function tocList( string $toc, ?Language $lang = null ): string
-	{
+	private static function tocList( string $toc, ?Language $lang = null ): string {
 		$lang ??= RequestContext::getMain()->getLanguage();
 
 		$title = wfMessage( 'toc' )->inLanguage( $lang )->escaped();
@@ -535,8 +548,7 @@ class SuperPageTOC
 	 *   - 'maxtoclevel' Max TOC level to generate
 	 * @return string HTML fragment
 	 */
-	private static function generateTOC( ?TOCData $tocData, ?Language $lang = null, array $options = [] ): string
-	{
+	private static function generateTOC( ?TOCData $tocData, ?Language $lang = null, array $options = [] ): string {
 		$toc = '';
 		$lastLevel = 0;
 		$maxTocLevel = $options['maxtoclevel'] ?? null;
@@ -573,4 +585,3 @@ class SuperPageTOC
 		return self::tocList( $toc, $lang );
 	}
 }
-
