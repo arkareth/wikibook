@@ -5,26 +5,30 @@
 }
 
 @media (max-width: 767px) {
-	/* Sidebar hidden by default; show only when .visible (so existing toggle controls visibility) */
-	#sidebar-left:has(#tweekiTOC),
-	#sidebar-right:has(#tweekiTOC) {
+	/*
+	 * Only apply TOC sidebar show/hide when the page actually has a TOC.
+	 * Tweeki always outputs empty #tweekiTOC; JS moves #toc into it only on TOC pages.
+	 * So :has(#tweekiTOC #toc) matches only when the sidebar contains the real TOC.
+	 */
+	#sidebar-left:has(#tweekiTOC #toc),
+	#sidebar-right:has(#tweekiTOC #toc) {
 		display: none !important;
 	}
-	#sidebar-left:has(#tweekiTOC).visible,
-	#sidebar-right:has(#tweekiTOC).visible {
+	#sidebar-left:has(#tweekiTOC #toc).visible,
+	#sidebar-right:has(#tweekiTOC #toc).visible {
 		display: block !important;
 		background: #fff;
 		border: 1px solid #a2a9b1;
 		max-height: none;
 		position:fixed;
 	}
-	#tweekiTOC .toctogglecheckbox {
+	#tweekiTOC #toc .toctogglecheckbox {
 		display: inline !important;
 		position: absolute;
 		opacity: 0;
 		z-index: -1;
 	}
-	#tweekiTOC .toctogglespan {
+	#tweekiTOC #toc .toctogglespan {
 		display: inline !important;
 	}
 	/* Ensure native checkbox hides the list (override .nav.flex-column display) */
@@ -32,3 +36,4 @@
 		display: none !important;
 	}
 }
+
