@@ -1,5 +1,34 @@
 /* TOC container in sidebar: limit height and scroll so long TOCs don't overflow */
 #tweekiTOC {
-	max-height: 100vh;
+	max-height: calc(100vh - 150px);
 	overflow-y: auto;
+}
+
+@media (max-width: 767px) {
+	/* Sidebar hidden by default; show only when .visible (so existing toggle controls visibility) */
+	#sidebar-left:has(#tweekiTOC),
+	#sidebar-right:has(#tweekiTOC) {
+		display: none !important;
+	}
+	#sidebar-left:has(#tweekiTOC).visible,
+	#sidebar-right:has(#tweekiTOC).visible {
+		display: block !important;
+		background: #fff;
+		border: 1px solid #a2a9b1;
+		max-height: none;
+		position:fixed;
+	}
+	#tweekiTOC .toctogglecheckbox {
+		display: inline !important;
+		position: absolute;
+		opacity: 0;
+		z-index: -1;
+	}
+	#tweekiTOC .toctogglespan {
+		display: inline !important;
+	}
+	/* Ensure native checkbox hides the list (override .nav.flex-column display) */
+	#tweekiTOC #toc .toctogglecheckbox:checked ~ ul {
+		display: none !important;
+	}
 }

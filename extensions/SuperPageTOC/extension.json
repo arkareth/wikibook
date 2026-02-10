@@ -1,39 +1,37 @@
 {
-	"name": "SuperPageTOC",
-	"version": "1.0.0",
-	"author": [
-		"Sergey Menshikov"
-	],
-	"requires": {
-		"MediaWiki": ">= 1.43",
-		"platform": {
-			"php": ">= 8.3"
-		}
-	},
-	"url": "https://www.mediawiki.org/wiki/Extension:BoilerPlate",
-	"license-name": "MIT",
-	"type": "other",
-	"MessagesDirs": {
-		"SuperPageTOC": [
-			"i18n"
-		]
-	},
-	"AutoloadClasses": {
-		"SuperPageTOC": "SuperPageTOC.class.php"
-	},
-	"Hooks": {
-		"BeforePageDisplay": "SuperPageTOC::onBeforePageDisplay",
-		"ParserAfterParse": "SuperPageTOC::onParserAfterParse",
-		"ParserBeforeInternalParse": "SuperPageTOC::onParserBeforeStrip"
-	},
-	"ResourceModules": {
-		"ext.superpagetoc.styles": {
-			"localBasePath": "resources",
-			"remoteExtPath": "SuperPageTOC/resources",
-			"styles": [ "superpagetoc.css", "superpagetoc-tweeki.css" ],
-			"targets": [ "desktop", "mobile" ]
-		}
-	},
-	"manifest_version": 1
+  "name": "SuperPageTOC",
+  "version": "1.0.0",
+  "author": [
+    "Sergey Menshikov"
+  ],
+  "url": "https://www.mediawiki.org/wiki/Extension:BoilerPlate",
+  "license-name": "MIT",
+  "type": "other",
+  "MessagesDirs": {
+    "SuperPageTOC": [
+      "i18n"
+    ]
+  },
+  "AutoloadClasses": {
+    "SuperPageTOC": "SuperPageTOC.class.php"
+  },
+  "Hooks": {
+    "BeforePageDisplay": "SuperPageTOC::onBeforePageDisplay",
+    "ParserAfterParse": "SuperPageTOC::onParserAfterParse",
+    "ParserBeforeInternalParse": "SuperPageTOC::onParserBeforeStrip"
+  },
+  "ResourceModules": {
+    "ext.superpagetoc.styles": {
+      "localBasePath": "resources",
+      "remoteExtPath": "SuperPageTOC/resources",
+      "styles": [
+        "superpagetoc-tweeki.css"
+      ],
+      "targets": [
+        "desktop",
+        "mobile"
+      ]
+    }
+  },
+  "manifest_version": 1
 }
-
