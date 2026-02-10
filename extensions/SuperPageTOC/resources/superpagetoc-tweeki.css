@@ -1,0 +1,5 @@
+/* TOC container in sidebar: limit height and scroll so long TOCs don't overflow */
+#tweekiTOC {
+	max-height: 100vh;
+	overflow-y: auto;
+}
