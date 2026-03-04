@@ -83,8 +83,11 @@ class SuperPageTOC
 		}
 		$request = RequestContext::getMain()->getRequest();
 		$action = $request->getVal( 'action', 'view' );
-		// Only inject version selector and TOC on view/print (not purge, history, etc.)
-		if ( in_array( $action, [ 'view', 'print' ], true ) || $action === null ) {
+		// Inject on normal article view/print, or when the VE save API runs (action=visualeditoredit).
+		// The post-save parser cache update happens inside that API request; without injection here
+		// the cached output would be missing language/version links until the next ?action=purge.
+		$inject = in_array( $action, [ 'view', 'print', 'visualeditoredit' ], true ) || $action === null;
+		if ( $inject ) {
 			// Per parser instance so each parse (e.g. oldid view) gets the injection; static $hasRun
 			// once per request caused version controls/TOC to be skipped on ?oldid pages.
 			static $injectedParserIds = [];
