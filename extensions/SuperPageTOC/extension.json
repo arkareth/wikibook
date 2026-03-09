@@ -31,6 +31,20 @@
         "desktop",
         "mobile"
       ]
+    },
+    "ext.superpagetoc.tweeki": {
+      "localBasePath": "resources",
+      "remoteExtPath": "SuperPageTOC/resources",
+      "scripts": [
+        "superpagetoc-tweeki.js"
+      ],
+      "dependencies": [
+        "jquery"
+      ],
+      "targets": [
+        "desktop",
+        "mobile"
+      ]
     }
   },
   "manifest_version": 1

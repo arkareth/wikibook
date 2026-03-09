@@ -1,10 +1,4 @@
-/* TOC container in sidebar: limit height and scroll so long TOCs don't overflow */
-#tweekiTOC {
-	max-height: calc(100vh - 150px);
-	overflow-y: auto;
-}
-
-@media (max-width: 767px) {
+@media (max-width: 1200px) {
 	/*
 	 * Only apply TOC sidebar show/hide when the page actually has a TOC.
 	 * Tweeki always outputs empty #tweekiTOC; JS moves #toc into it only on TOC pages.
@@ -20,7 +14,7 @@
 		background: #fff;
 		border: 1px solid #a2a9b1;
 		max-height: none;
-		position:fixed;
+		position: fixed;
 	}
 	#tweekiTOC #toc .toctogglecheckbox {
 		display: inline !important;

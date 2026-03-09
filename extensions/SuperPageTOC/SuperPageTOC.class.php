@@ -64,6 +64,9 @@ class SuperPageTOC
 		if ( in_array( $skinName, [ 'tweeki', 'vector' ], true ) ) {
 			$out->addModuleStyles( [ 'ext.superpagetoc.styles' ] );
 		}
+		if ( $skinName === 'tweeki' ) {
+			$out->addModules( [ 'ext.superpagetoc.tweeki' ] );
+		}
 	}
 
 	/**
