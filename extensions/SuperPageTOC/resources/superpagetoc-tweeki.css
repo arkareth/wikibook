@@ -1,3 +1,14 @@
+/*
+ * When viewing the current page, its sections are nested inside li.toc-open in the
+ * super-page TOC. Tweeki's accordion CSS hides all ul > li > ul by default and only
+ * reveals them via scrollspy .active, which never fires for external-page <a> links.
+ * Override: always show all sub-lists inside the open (current-page) TOC entry.
+ */
+#tweekiTOC #toc li.toc-open > ul,
+#tweekiTOC #toc li.toc-open > ul ul {
+	display: block !important;
+}
+
 @media (max-width: 1200px) {
 	/*
 	 * Only apply TOC sidebar show/hide when the page actually has a TOC.

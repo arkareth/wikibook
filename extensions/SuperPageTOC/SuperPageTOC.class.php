@@ -219,7 +219,7 @@ class SuperPageTOC
 			if ( $openli ) {
 				$newTocText .= '</li>';
 			}
-			// Add beginning and end of the original HTML toc and replace TOC in the page
+				// Add beginning and end of the original HTML toc and replace TOC in the page
 			$newToc = substr( $tocText, 0, $index1 ) . $newTocText . substr( $tocText, $index2 );
 			$text = Parser::replaceTableOfContentsMarker( $text, $newToc );
 
