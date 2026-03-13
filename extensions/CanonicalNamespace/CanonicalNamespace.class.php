@@ -69,6 +69,7 @@ class CanonicalNamespace {
 	}
 
 	/**
+	 * Removed after v1.43 update. If needed again - add "BeforePageDisplay": "CanonicalNamespace::onBeforePageDisplay" to extension.json
 	 * Set canonical URL for pages in extra namespaces to the latest namespace.
 	 *
 	 * @param \OutputPage &$out OutputPage

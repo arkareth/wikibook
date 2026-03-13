@@ -13,7 +13,6 @@
 	},
 	"Hooks": {
 		"BeforeDisplayNoArticleText": "CanonicalNamespace::onBeforeDisplayNoArticleText",
-		"BeforePageDisplay": "CanonicalNamespace::onBeforePageDisplay",
 		"InternalParseBeforeLinks": "CanonicalNamespace::onInternalParseBeforeLinks"
 	},
 	"manifest_version": 1
