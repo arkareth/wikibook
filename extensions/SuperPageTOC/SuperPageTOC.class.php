@@ -158,9 +158,24 @@ class SuperPageTOC
 				$index1 += 4;
 			}
 			foreach ( $tocList as $item ) {
-				// Not a link - text
+				// Not a link - text (section label like "Introduction", "Getting Started")
 				if ( $item['link'] === null ) {
-					// TODO close li before static if changing levels - save levels with static
+					// Close any open <li> from the previous item
+					if ( $openli ) {
+						$newTocText .= '</li>';
+						$openli = false;
+					}
+					// Adjust nesting depth to match where this label sits in the hierarchy.
+					// Static items carry the level of the surrounding bullet items so they
+					// render at the correct indentation without closing their parent section.
+					$staticLevel = max( 1, $item['level'] );
+					if ( $level > $staticLevel ) {
+						$newTocText .= str_repeat( '</ul></li>', $level - $staticLevel );
+						$level = $staticLevel;
+					} elseif ( $level < $staticLevel ) {
+						$newTocText .= str_repeat( '<ul>', $staticLevel - $level );
+						$level = $staticLevel;
+					}
 					$newTocText .= '<span class="toclevel-' . $level . ' toctext tocstatic">' .
 						htmlspecialchars( $item['title'] ) . '</span>';
 					continue;
@@ -294,11 +309,13 @@ class SuperPageTOC
 
 		// For each line in toc:, look for bullets with links; bullets can be multi-level
 		$results = [];
+		$lastLevel = 1;
 		foreach ( explode( PHP_EOL, $superPageText ) as $line ) {
 			// Link, with a bullet
 			if ( preg_match( "/^(\*+)\s*\[\[\s*([^|]+)\s*(?:\|\s*([^\]]*))?\]\]/", $line, $matches ) == 1 ) {
 				$asterisks = $matches[1];
 				$level = strlen( $asterisks );
+				$lastLevel = $level;
 				$url = trim( $matches[2] );
 				if ( self::$mPageLangCode != self::$mContLangCode ) {
 					$url .= "/" . self::$mPageLangCode;
@@ -324,7 +341,7 @@ class SuperPageTOC
 			} elseif ( preg_match( "/(=.+?=|<.+>)/", $line ) ) {
 				// Ignore headings and markup
 			} elseif ( strlen( trim( $line ) ) > 0 ) {
-				$results[] = [ 'level' => 0, 'title' => $line, 'link' => null ];
+				$results[] = [ 'level' => $lastLevel, 'title' => $line, 'link' => null ];
 			}
 		}
 		if ( !$topicFound ) {
